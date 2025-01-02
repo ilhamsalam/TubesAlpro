@@ -30,6 +30,8 @@ var (
 	spareParts   [maxSpareParts]SparePart
 	customers    [maxCustomers]Customer
 	transactions [maxTransactions]Transaction
+	countCustomers [maxCustomers]int
+	countSpareParts [maxSpareParts]int
 
 	numSpareParts   int
 	numCustomers    int
@@ -445,17 +447,20 @@ func favoritServiceMotor() {
 }
 
 func favoritBerdasarkanPelanggan() {
-	count := make([]int, numCustomers)
+	// Reset count array
+	for i := 0; i < numCustomers; i++ {
+		countCustomers[i] = 0
+	}
 
 	for _, transaction := range transactions[:numTransactions] {
-		count[transaction.CustomerID]++
+		countCustomers[transaction.CustomerID]++
 	}
 
 	// Sorting pelanggan berdasarkan jumlah transaksi (descending)
 	for i := 0; i < numCustomers-1; i++ {
 		for j := i + 1; j < numCustomers; j++ {
-			if count[i] < count[j] {
-				count[i], count[j] = count[j], count[i]
+			if countCustomers[i] < countCustomers[j] {
+				countCustomers[i], countCustomers[j] = countCustomers[j], countCustomers[i]
 				customers[i], customers[j] = customers[j], customers[i]
 			}
 		}
@@ -463,24 +468,27 @@ func favoritBerdasarkanPelanggan() {
 
 	fmt.Println("Pelanggan favorit berdasarkan jumlah transaksi:")
 	for i := 0; i < numCustomers; i++ {
-		if count[i] > 0 {
-			fmt.Printf("Pelanggan: %s, Jumlah transaksi: %d\n", customers[i].Name, count[i])
+		if countCustomers[i] > 0 {
+			fmt.Printf("Pelanggan: %s, Jumlah transaksi: %d\n", customers[i].Name, countCustomers[i])
 		}
 	}
 }
 
 func favoritBerdasarkanSparePart() {
-	count := make([]int, numSpareParts)
+	// Reset count array
+	for i := 0; i < numSpareParts; i++ {
+		countSpareParts[i] = 0
+	}
 
 	for _, transaction := range transactions[:numTransactions] {
-		count[transaction.SparePartID] += transaction.Quantity
+		countSpareParts[transaction.SparePartID] += transaction.Quantity
 	}
 
 	// Sorting spare-part berdasarkan jumlah penggunaan (descending)
 	for i := 0; i < numSpareParts-1; i++ {
 		for j := i + 1; j < numSpareParts; j++ {
-			if count[i] < count[j] {
-				count[i], count[j] = count[j], count[i]
+			if countSpareParts[i] < countSpareParts[j] {
+				countSpareParts[i], countSpareParts[j] = countSpareParts[j], countSpareParts[i]
 				spareParts[i], spareParts[j] = spareParts[j], spareParts[i]
 			}
 		}
@@ -488,8 +496,8 @@ func favoritBerdasarkanSparePart() {
 
 	fmt.Println("Spare-part favorit berdasarkan jumlah penggunaan:")
 	for i := 0; i < numSpareParts; i++ {
-		if count[i] > 0 {
-			fmt.Printf("Spare-part: %s, Jumlah penggunaan: %d\n", spareParts[i].Name, count[i])
+		if countSpareParts[i] > 0 {
+			fmt.Printf("Spare-part: %s, Jumlah penggunaan: %d\n", spareParts[i].Name, countSpareParts[i])
 		}
 	}
 }
